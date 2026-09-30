@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 # ========== CONFIGURACIÓN ==========
 # Argumentos para Chrome que reducen el uso de memoria (clave en Render Free)
 CHROME_ARGS = [
+    '--headless=new',          # <-- AÑADIDO: Fuerza el modo headless moderno
     '--no-sandbox',
     '--disable-setuid-sandbox',
     '--disable-dev-shm-usage',
