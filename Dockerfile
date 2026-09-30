@@ -1,15 +1,16 @@
 FROM python:3.11-slim
 
-# Evita que Python escriba archivos .pyc y fuerza salida sin buffer
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# Instalar dependencias del sistema necesarias para curl_cffi
+# Instalar dependencias del sistema, incluyendo Chrome
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     curl \
+    chromium \
+    chromium-driver \
     && rm -rf /var/lib/apt/lists/*
 
 # Copiar e instalar dependencias de Python
@@ -20,8 +21,6 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Copiar el código de la aplicación
 COPY app.py .
 
-# Render usa el puerto 10000 por defecto
 EXPOSE 10000
 
-# Comando de inicio
 CMD ["gunicorn", "--bind", "0.0.0.0:10000", "--timeout", "120", "app:app"]
