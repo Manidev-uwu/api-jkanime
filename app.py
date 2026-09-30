@@ -9,7 +9,6 @@ app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# ========== ARGUMENTOS DE CHROME (con --headless=new) ==========
 CHROME_ARGS = [
     '--headless=new',
     '--no-sandbox',
@@ -27,19 +26,20 @@ CHROME_ARGS = [
 async def obtener_html_con_nodriver(url_objetivo):
     logger.info(f"Iniciando nodriver para: {url_objetivo}")
 
+    # sandbox=False es esencial para que Chrome arranque en Docker
     driver = await uc.start(
         headless=True,
+        sandbox=False,
         browser_args=CHROME_ARGS,
         browser_executable_path="/usr/bin/chromium",
     )
 
-    # Verificación defensiva: si driver es None, uc.start() falló
     if driver is None:
         raise Exception(
             "uc.start() devolvió None. Posibles causas: "
             "1) websockets incompatible (usa websockets==13.1), "
-            "2) Chromium no encontrado en /usr/bin/chromium, "
-            "3) Falta --headless=new en browser_args."
+            "2) Falta sandbox=False, "
+            "3) Chromium no encontrado en /usr/bin/chromium."
         )
 
     try:
@@ -84,10 +84,7 @@ def obtener_html():
 
     except Exception as e:
         logger.error(f"❌ Error: {str(e)}")
-        return jsonify({
-            "error": str(e),
-            "url_solicitada": url_objetivo
-        }), 500
+        return jsonify({"error": str(e), "url_solicitada": url_objetivo}), 500
 
 
 @app.route('/health', methods=['GET'])
