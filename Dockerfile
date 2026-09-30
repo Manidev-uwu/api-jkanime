@@ -5,7 +5,6 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# Dependencias del sistema (incluye Chromium que usa nodriver)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     curl \
@@ -21,5 +20,4 @@ COPY app.py .
 
 EXPOSE 10000
 
-# Importante: 1 solo worker para no multiplicar el consumo de RAM
 CMD ["gunicorn", "--bind", "0.0.0.0:10000", "--timeout", "180", "--workers", "1", "--threads", "2", "app:app"]
